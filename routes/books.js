@@ -1,122 +1,153 @@
-var express = require('express');
+var express = require("express");
 var router = express.Router();
-var connection = require('../lib/db');
-console.log('hello');
+var connection = require("../lib/db");
+
+var moment = require("moment");
+
 /* GET home page. */
-router.get('/', function(req, res, next) {
-  connection.query('SELECT * FROM records ORDER BY id desc', function(
+router.get("/", function(req, res, next) {
+  connection.query("SELECT * FROM records ORDER BY id ASC", function(
     err,
     rows
   ) {
     if (err) {
-      res.render('index', {
+      res.render("index", {
         messages: { success: false, error: err },
-        data: ''
+        data: ""
       });
     } else {
-      console.log('rows', rows);
-      res.render('index', {
-        page_title: 'Customers - Node.js',
+      // console.log("rows", rows);
+      res.render("index", {
+        page_title: "Customers - Node.js",
         messages: {
           success: true
         },
-        data: rows
+        data: rows,
+        moment: moment
       });
     }
   });
 });
 
 // SHOW ADD USER FORM
-router.get('/add', function(req, res, next) {
+router.get("/add", function(req, res, next) {
   // render to views/user/add.ejs
-  res.render('add', {
+  res.render("add", {
     message: {
       success: true,
       error: null
     },
-    title: 'Add New Customers',
-    name: '',
-    email: ''
+    title: "Add New Customers",
+    name: "",
+    email: ""
   });
 });
 
 // ADD NEW USER POST ACTION
-router.post('/add', function(req, res, next) {
-  req.assert('name', 'Name is required').notEmpty(); //Validate name
-  req.assert('email', 'A valid email is required').isEmail(); //Validate email
-
-  var errors = req.validationErrors();
-
-  if (!errors) {
-    //No errors were found.  Passed Validation!
-
-    var user = {
-      name: req
-        .sanitize('name')
-        .escape()
-        .trim(),
-      email: req
-        .sanitize('email')
-        .escape()
-        .trim()
+router.post("/add", function(req, res, next) {
+  console.log("req.body", req.body);
+  try {
+    var data = {
+      name: req.body.name,
+      date: req.body.date,
+      amount: req.body.amount,
+      subject: req.body.subject
     };
 
-    connection.query('INSERT INTO customers SET ?', user, function(
-      err,
-      result
-    ) {
-      //if(err) throw err
+    connection.query("INSERT INTO records SET ?", data, function(err, result) {
       if (err) {
-        req.flash('error', err);
-
-        // render to views/user/add.ejs
-        res.render('customers/add', {
-          title: 'Add New Customer',
-          name: user.name,
-          email: user.email
-        });
-      } else {
-        req.flash('success', 'Data added successfully!');
-        res.redirect('/customers');
+        console.log("ERR;", err);
+        throw err;
       }
+      console.log("result", result);
+      res.redirect("/books");
+      //   connection.query("SELECT * FROM records ORDER BY id ASC", function(
+      //     err,
+      //     rows
+      //   ) {
+      //     if (err) {
+      //       res.render("index", {
+      //         messages: { success: false, error: err },
+      //         data: ""
+      //       });
+      //     } else {
+      //       console.log("rows", rows);
+      //       res.render("index", {
+      //         page_title: "Customers - Node.js",
+      //         messages: {
+      //           success: true
+      //         },
+      //         data: rows,
+      //         moment: moment
+      //       });
+      //     }
+      //   });
     });
-  } else {
-    //Display errors to user
-    var error_msg = '';
-    errors.forEach(function(error) {
-      error_msg += error.msg + '<br>';
-    });
-    req.flash('error', error_msg);
-
-    /**
-     * Using req.body.name
-     * because req.param('name') is deprecated
-     */
-
-    res.render('customers/add', {
-      title: 'Add New Customer',
-      name: req.body.name,
-      email: req.body.email
-    });
+  } catch (err) {
+    throw new Error(err);
   }
+  // if (!errors) {
+  //   //No errors were found.  Passed Validation!
+
+  //   var user = {
+  //     name: req
+  //       .sanitize("name")
+  //       .escape()
+  //       .trim(),
+  //     email: req
+  //       .sanitize("email")
+  //       .escape()
+  //       .trim()
+  //   };
+
+  //   connection.query("INSERT INTO customers SET ?", user, function(
+  //     err,
+  //     result
+  //   ) {
+  //     //if(err) throw err
+  //     if (err) {
+
+  //       // render to views/user/add.ejs
+  //       res.render("books/add", {
+  //         title: "Add New Customer",
+  //         name: user.name,
+  //         email: user.email
+  //       });
+  //     } else {
+  //       res.redirect("/books");
+  //     }
+  // });
+  // } else {
+
+  /**
+   * Using req.body.name
+   * because req.param('name') is deprecated
+   */
+
+  //   res.render("customers/add", {
+  //     title: "Add New Customer",
+  //     name: req.body.name,
+  //     email: req.body.email
+  //   });
+  // }
 });
 
 // SHOW EDIT USER FORM
-router.get('/edit/(:id)', function(req, res, next) {
+router.get("/edit/(:id)", function(req, res, next) {
   connection.query(
-    'SELECT * FROM customers WHERE id = ' + req.params.id,
+    "SELECT * FROM customers WHERE id = " + req.params.id,
     function(err, rows, fields) {
       if (err) throw err;
 
       // if user not found
       if (rows.length <= 0) {
-        req.flash('error', 'Customers not found with id = ' + req.params.id);
-        res.redirect('/customers');
+        req.flash("error", "Customers not found with id = " + req.params.id);
+        res.redirect("/customers");
       } else {
         // if user found
         // render to views/user/edit.ejs template file
-        res.render('customers/edit', {
-          title: 'Edit Customer',
+        res.render("customers/edit", {
+          title: "Edit Customer",
           //data: rows[0],
           id: rows[0].id,
           name: rows[0].name,
@@ -128,60 +159,60 @@ router.get('/edit/(:id)', function(req, res, next) {
 });
 
 // EDIT USER POST ACTION
-router.post('/update/:id', function(req, res, next) {
-  req.assert('name', 'Name is required').notEmpty(); //Validate nam           //Validate age
-  req.assert('email', 'A valid email is required').isEmail(); //Validate email
+router.post("/update/:id", function(req, res, next) {
+  req.assert("name", "Name is required").notEmpty(); //Validate nam           //Validate age
+  req.assert("email", "A valid email is required").isEmail(); //Validate email
 
   var errors = req.validationErrors();
 
   if (!errors) {
     var user = {
       name: req
-        .sanitize('name')
+        .sanitize("name")
         .escape()
         .trim(),
       email: req
-        .sanitize('email')
+        .sanitize("email")
         .escape()
         .trim()
     };
 
     connection.query(
-      'UPDATE customers SET ? WHERE id = ' + req.params.id,
+      "UPDATE customers SET ? WHERE id = " + req.params.id,
       user,
       function(err, result) {
         //if(err) throw err
         if (err) {
-          req.flash('error', err);
+          req.flash("error", err);
 
           // render to views/user/add.ejs
-          res.render('customers/edit', {
-            title: 'Edit Customer',
+          res.render("customers/edit", {
+            title: "Edit Customer",
             id: req.params.id,
             name: req.body.name,
             email: req.body.email
           });
         } else {
-          req.flash('success', 'Data updated successfully!');
-          res.redirect('/customers');
+          req.flash("success", "Data updated successfully!");
+          res.redirect("/customers");
         }
       }
     );
   } else {
     //Display errors to user
-    var error_msg = '';
+    var error_msg = "";
     errors.forEach(function(error) {
-      error_msg += error.msg + '<br>';
+      error_msg += error.msg + "<br>";
     });
-    req.flash('error', error_msg);
+    req.flash("error", error_msg);
 
     /**
      * Using req.body.name
      * because req.param('name') is deprecated
      */
 
-    res.render('customers/edit', {
-      title: 'Edit Customer',
+    res.render("customers/edit", {
+      title: "Edit Customer",
       id: req.params.id,
       name: req.body.name,
       email: req.body.email
@@ -190,25 +221,25 @@ router.post('/update/:id', function(req, res, next) {
 });
 
 // DELETE USER
-router.get('/delete/(:id)', function(req, res, next) {
+router.get("/delete/(:id)", function(req, res, next) {
   var user = { id: req.params.id };
 
   connection.query(
-    'DELETE FROM customers WHERE id = ' + req.params.id,
+    "DELETE FROM customers WHERE id = " + req.params.id,
     user,
     function(err, result) {
       //if(err) throw err
       if (err) {
-        req.flash('error', err);
+        req.flash("error", err);
         // redirect to users list page
-        res.redirect('/customers');
+        res.redirect("/customers");
       } else {
         req.flash(
-          'success',
-          'Customer deleted successfully! id = ' + req.params.id
+          "success",
+          "Customer deleted successfully! id = " + req.params.id
         );
         // redirect to users list page
-        res.redirect('/customers');
+        res.redirect("/customers");
       }
     }
   );
