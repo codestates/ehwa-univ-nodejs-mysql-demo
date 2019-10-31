@@ -61,97 +61,38 @@ router.post('/add', function(req, res, next) {
       }
       console.log('result', result);
       res.redirect('/books');
-      //   connection.query("SELECT * FROM records ORDER BY id ASC", function(
-      //     err,
-      //     rows
-      //   ) {
-      //     if (err) {
-      //       res.render("index", {
-      //         messages: { success: false, error: err },
-      //         data: ""
-      //       });
-      //     } else {
-      //       console.log("rows", rows);
-      //       res.render("index", {
-      //         page_title: "Customers - Node.js",
-      //         messages: {
-      //           success: true
-      //         },
-      //         data: rows,
-      //         moment: moment
-      //       });
-      //     }
-      //   });
     });
   } catch (err) {
     throw new Error(err);
   }
-  // if (!errors) {
-  //   //No errors were found.  Passed Validation!
-
-  //   var user = {
-  //     name: req
-  //       .sanitize("name")
-  //       .escape()
-  //       .trim(),
-  //     email: req
-  //       .sanitize("email")
-  //       .escape()
-  //       .trim()
-  //   };
-
-  //   connection.query("INSERT INTO customers SET ?", user, function(
-  //     err,
-  //     result
-  //   ) {
-  //     //if(err) throw err
-  //     if (err) {
-
-  //       // render to views/user/add.ejs
-  //       res.render("books/add", {
-  //         title: "Add New Customer",
-  //         name: user.name,
-  //         email: user.email
-  //       });
-  //     } else {
-  //       res.redirect("/books");
-  //     }
-  // });
-  // } else {
-
-  /**
-   * Using req.body.name
-   * because req.param('name') is deprecated
-   */
-
-  //   res.render("customers/add", {
-  //     title: "Add New Customer",
-  //     name: req.body.name,
-  //     email: req.body.email
-  //   });
-  // }
 });
 
 // SHOW EDIT USER FORM
 router.get('/edit/(:id)', function(req, res, next) {
+  console.log('hi', req.params.id);
   connection.query(
-    'SELECT * FROM customers WHERE id = ' + req.params.id,
-    function(err, rows, fields) {
-      if (err) throw err;
+    'SELECT * FROM records WHERE id = ' + req.params.id,
+    function(err, result, fields) {
+      if (err) {
+        console.log('err', err);
+        return;
+      }
 
       // if user not found
-      if (rows.length <= 0) {
-        req.flash('error', 'Customers not found with id = ' + req.params.id);
-        res.redirect('/customers');
+      if (result.length <= 0) {
+        res.redirect('/books');
       } else {
         // if user found
+        console.log('result', result);
         // render to views/user/edit.ejs template file
-        res.render('customers/edit', {
-          title: 'Edit Customer',
-          //data: rows[0],
-          id: rows[0].id,
-          name: rows[0].name,
-          email: rows[0].email
+        res.render('edit', {
+          title: 'Edit Records',
+          //data: result[0],
+          id: result[0].id,
+          name: result[0].name,
+          date: moment(result[0].date).format('YYYY-MM-DD'),
+          amount: result[0].amount,
+          subject: result[0].subject
         });
       }
     }
@@ -160,86 +101,53 @@ router.get('/edit/(:id)', function(req, res, next) {
 
 // EDIT USER POST ACTION
 router.post('/update/:id', function(req, res, next) {
-  req.assert('name', 'Name is required').notEmpty(); //Validate nam           //Validate age
-  req.assert('email', 'A valid email is required').isEmail(); //Validate email
-
-  var errors = req.validationErrors();
-
-  if (!errors) {
-    var user = {
-      name: req
-        .sanitize('name')
-        .escape()
-        .trim(),
-      email: req
-        .sanitize('email')
-        .escape()
-        .trim()
-    };
-
-    connection.query(
-      'UPDATE customers SET ? WHERE id = ' + req.params.id,
-      user,
-      function(err, result) {
-        //if(err) throw err
-        if (err) {
-          req.flash('error', err);
-
-          // render to views/user/add.ejs
-          res.render('customers/edit', {
-            title: 'Edit Customer',
-            id: req.params.id,
-            name: req.body.name,
-            email: req.body.email
-          });
-        } else {
-          req.flash('success', 'Data updated successfully!');
-          res.redirect('/customers');
-        }
+  console.log('req.body', req.body);
+  var record = {
+    name: req.body.name,
+    date: req.body.date,
+    amount: req.body.amount,
+    subject: req.body.subject
+  };
+  connection.query(
+    'UPDATE records SET ? WHERE id = ' + req.params.id,
+    record,
+    function(err, result) {
+      //if(err) throw err
+      if (err) {
+        console.log('err', err);
+        // render to views/user/add.ejs
+        res.render('books/edit', {
+          title: 'Edit Customer',
+          id: req.params.id,
+          name: req.body.name,
+          date: req.body.date,
+          amount: req.body.amount,
+          subject: req.body.subject
+        });
+      } else {
+        res.redirect('/books');
       }
-    );
-  } else {
-    //Display errors to user
-    var error_msg = '';
-    errors.forEach(function(error) {
-      error_msg += error.msg + '<br>';
-    });
-    req.flash('error', error_msg);
-
-    /**
-     * Using req.body.name
-     * because req.param('name') is deprecated
-     */
-
-    res.render('customers/edit', {
-      title: 'Edit Customer',
-      id: req.params.id,
-      name: req.body.name,
-      email: req.body.email
-    });
-  }
+    }
+  );
 });
 
 // DELETE USER
 router.get('/delete/(:id)', function(req, res, next) {
+  console.log('req.params.id', req.params.id);
   var user = { id: req.params.id };
 
   connection.query(
-    'DELETE FROM customers WHERE id = ' + req.params.id,
+    'DELETE FROM records WHERE id = ' + req.params.id,
     user,
     function(err, result) {
       //if(err) throw err
       if (err) {
-        req.flash('error', err);
+        console.log('err', err);
         // redirect to users list page
-        res.redirect('/customers');
+        res.redirect('/books');
       } else {
-        req.flash(
-          'success',
-          'Customer deleted successfully! id = ' + req.params.id
-        );
         // redirect to users list page
-        res.redirect('/customers');
+        res.redirect('/books');
       }
     }
   );

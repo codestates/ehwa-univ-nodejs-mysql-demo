@@ -17,7 +17,7 @@
     />
   </head>
   <body>
-    <table class="table">
+    <table class="table m-3">
       <thead>
         <tr>
           <th scope="col">#</th>
@@ -39,13 +39,13 @@
           <td>
             <a
               class="btn btn-success edit"
-              href="../customers/edit/<%=data[i].id%>"
+              href="/books/edit/<%=data[i].id%>"
               >Edit</a
             >
             <a
               class="btn btn-danger delete"
               onclick="return alert('Are You sure?')"
-              href="../customers/delete/<%=data[i].id%>"
+              href="/books/delete/<%=data[i].id%>"
               >Delete</a
             >
           </td>
@@ -57,7 +57,7 @@
         <% } %>
       </tbody>
     </table>
-    <form action="/books/add" method="post" name="form1">
+    <form action="/books/add" method="post" name="form1" class="m-3">
       <div class="form-group">
         <label for="exampleInputPassword1">Name</label>
         <input
@@ -102,7 +102,7 @@
           placeholder="Enter subject"
           value=""
         />
-      <input type="submit" class="btn btn-primary" value="Add" />
+      <input type="submit" class="btn btn-primary mt-3" value="Add" />
     </form>
   </body>
 </html>

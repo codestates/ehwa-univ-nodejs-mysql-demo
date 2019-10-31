@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Customers</title>
+    <title>Books</title>
     <link rel="stylesheet" href="/stylesheets/style.css" />
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
     <script
@@ -17,32 +17,52 @@
     />
   </head>
   <body>
-    <form action="/customers/update/<%= id %>" method="post" name="form1">
+    <form action="/books/update/<%= id %>" method="post" name="form1">
       <div class="form-group">
-        <label for="exampleInputPassword1">Name</label>
-        <input
-          type="text"
-          class="form-control"
-          name="name"
-          id="name"
-          value="<%= name %>"
-          placeholder="Name"
-        />
-      </div>
-      <div class="form-group">
-        <label for="exampleInputEmail1">Email address</label>
-        <input
-          type="email"
-          class="form-control"
-          name="email"
-          id="email"
-          aria-describedby="emailHelp"
-          placeholder="Enter email"
-          value="<%= email %>"
-        />
-      </div>
-
-      <button type="submit" class="btn btn-info">Update</button>
+      </div><label for="exampleInputName">Name</label>
+      <input
+        type="text"
+        class="form-control"
+        name="name"
+        id="name"
+        value="<%= name %>"
+        placeholder="Name"
+      />
+    </div>
+    <div class="form-group mt-3">
+      <label for="exampleInputDate">Date</label>
+      <input
+        type="date"
+        name="date"
+        class="form-control"
+        id="date"
+        aria-describedby="emailHelp"
+        placeholder="Enter date"
+        value="<%= date %>"
+      />
+    <div class="form-group mt-3">
+      <label for="exampleInputAmount">Amount</label>
+      <input
+        type="number"
+        name="amount"
+        class="form-control"
+        id="amount"
+        aria-describedby="emailHelp"
+        placeholder="Enter amount"
+        value="<%= amount %>"
+      />
+    <div class="form-group mt-3">
+      <label for="exampleInputSubject">Subject</label>
+      <input
+        type="text"
+        name="subject"
+        class="form-control"
+        id="subject"
+        aria-describedby="emailHelp"
+        placeholder="Enter subject"
+        value="<%= subject %>"
+      />
+      <button type="submit" class="btn btn-info mt-3">Update</button>
     </form>
   </body>
 </html>
