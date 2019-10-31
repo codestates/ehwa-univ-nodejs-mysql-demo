@@ -17,19 +17,6 @@
     />
   </head>
   <body>
-    <div>
-      <a href="/" class="btn btn-primary ml-3">Home</a>
-      <a href="/books/add" class="btn btn-secondary ml-3">New Records</a>
-      <a href="/books" class="btn btn-info ml-3">Record List</a>
-    </div>
-    <!--   <% if (messages.error) { %>
-  <p style="color:red"><%- messages.error %></p>
-<% } %> -->
-
-    <% if (messages.success) { %>
-    <p class="alert alert-success mt-4"><%- messages.success %></p>
-    <% } %>
-    <br />
     <table class="table">
       <thead>
         <tr>
@@ -38,7 +25,6 @@
           <th scope="col">Date</th>
           <th scope="col">Amount</th>
           <th scope="col">Subject</th>
-          <th scope="col">Type</th>
           <th width="200px">Action</th>
         </tr>
       </thead>
@@ -47,10 +33,9 @@
         <tr>
           <th scope="row"><%= (i+1) %></th>
           <td><%= data[i].name%></td>
-          <td><%= data[i].date%></td>
+          <td><%= moment(data[i].date).format('YYYY-MM-DD')%></td>
           <td><%= data[i].amount%></td>
           <td><%= data[i].subject%></td>
-          <td><%= data[i].type%></td>
           <td>
             <a
               class="btn btn-success edit"
@@ -72,5 +57,52 @@
         <% } %>
       </tbody>
     </table>
+    <form action="/books/add" method="post" name="form1">
+      <div class="form-group">
+        <label for="exampleInputPassword1">Name</label>
+        <input
+          type="text"
+          class="form-control"
+          name="name"
+          id="name"
+          value=""
+          placeholder="Name"
+        />
+      </div>
+      <div class="form-group mt-3">
+        <label for="exampleInputDate">Date</label>
+        <input
+          type="date"
+          name="date"
+          class="form-control"
+          id="date"
+          aria-describedby="emailHelp"
+          placeholder="Enter date"
+          value=""
+        />
+      <div class="form-group mt-3">
+        <label for="exampleInputAmount">Amount</label>
+        <input
+          type="number"
+          name="amount"
+          class="form-control"
+          id="amount"
+          aria-describedby="emailHelp"
+          placeholder="Enter amount"
+          value=""
+        />
+      <div class="form-group mt-3">
+        <label for="exampleInputSubject">Subject</label>
+        <input
+          type="text"
+          name="subject"
+          class="form-control"
+          id="subject"
+          aria-describedby="emailHelp"
+          placeholder="Enter subject"
+          value=""
+        />
+      <input type="submit" class="btn btn-primary" value="Add" />
+    </form>
   </body>
 </html>
